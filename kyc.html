@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="renderer" content="webkit" />
+    <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>KYC</title>
+  </head>
+
+  <body>
+    <div id="sumsub-websdk-container"></div>
+  </body>
+  <script src="https://static.sumsub.com/idensic/static/sns-websdk-builder.js"></script>
+  <script>
+    function getAccessToken(tokenName) {
+      var s = window.location.search;
+      s = s.match(new RegExp(tokenName + '=([^&=]+)'));
+      return s ? s[1] : false;
+    }
+    const accessToken = getAccessToken('accessToken');
+    function launchWebSdk(accessToken) {
+      let snsWebSdkInstance = snsWebSdk
+        .init(accessToken, () => '')
+        .withConf({
+          lang: 'en', //language of WebSDK texts and comments (ISO 639-1 format)
+        })
+        .withOptions({ addViewportTag: false, adaptIframeHeight: true })
+        // see below what kind of messages WebSDK generates
+        .on('idCheck.stepCompleted', payload => {
+          if (payload.reviewStatus === 'completed' && payload.reviewResult.reviewAnswer === 'GREEN') {
+            window.ReactNativeWebView.postMessage('Success');
+          }
+        })
+        .on('idCheck.onError', error => {
+          console.log('onError', error);
+          window.ReactNativeWebView.postMessage('Error');
+        })
+        .build();
+
+      snsWebSdkInstance.launch('#sumsub-websdk-container');
+    }
+    launchWebSdk(accessToken);
+  </script>
+</html>

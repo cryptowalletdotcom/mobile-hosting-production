@@ -191,6 +191,7 @@
         }
         var config = {
           product: 'bind',
+          hideSuccess: true,
           onError: function (e) {
             e.desc = Object.assign({}, e.desc, { indexVersion: indexVersion });
             jsBridge.callNative({
